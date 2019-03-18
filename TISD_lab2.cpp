@@ -13,17 +13,23 @@ struct Node{
 class Tree{
 public:
 	Node* list; //Вершина дерева
-	int height; //Высота дерева (количество слоёв)
+
+	//Конструктор, создающий пустое дерево
+	Tree(){
+		list = new Node();
+		list->left = NULL;
+		list->right = NULL;
+	}
 
 	//Конструктор, создающий вершину дерева (символ на вход)
 	Tree(char _ch){
-		height = 0;
 		list = new Node();
 		list->data = _ch;
 		list->left = NULL;
 		list->right = NULL;
-		height++;
 	}
+
+
 	
 	//Функция добавления вершины (лист и символ на вход)
 	void AddItem(Node* _list, char _ch){
@@ -31,7 +37,6 @@ public:
 			_list->data = _ch;
 			_list->left = NULL;
 			_list->right = NULL;
-			height++;
 		} 
 		else
 		{
@@ -66,13 +71,127 @@ public:
 			}
 		}
 	}
+
+	void ClearTree(Node* _list){  //Функция очистки дерева
+		if (!_list->data){
+			cout << "Empty tree!" << endl;
+		} 
+		else
+		{
+			if (_list->left){			
+			ClearTree(_list->left);			
+			}
+			if (_list->right){			
+			ClearTree(_list->right);
+			}
+			_list->data = NULL;
+			_list->right = _list->left = NULL;
+		}
+		if (_list != list){
+			delete _list;
+		}
+	}
+
+	 static Tree* DeleteLit(Tree* _Tr,char* _str){     //Функция удаления согласных букв из дерева, объект класса на выход
+		char* buff = new char[100];
+		char* dia = new char[30];
+		int counter = 0;
+		int cnt = 0;
+		dia = "BCDFGHJKLMNPQRSTVWXZbcdfghjklmnpqrstvwxz";
+
+		//Построение новой строки для генерации дерева с исключением согласных букв
+		for (int i = 0; _str[i]; i++){
+			counter = 0;
+			for (int j = 0; dia[j]; j++){
+				if ((int)_str[i] == (int)dia[j]){
+					counter = 0;
+					break;
+				} 
+				else
+				{
+					counter = 1;
+				}
+			}
+			if (counter == 1){
+				buff[cnt] = _str[i];
+				cnt++;
+			}
+			
+		}
+		_Tr->ClearTree(_Tr->list);
+		Tree* _Bin = new Tree();
+		for (int i = 0; i < cnt; i++){
+			_Bin->AddItem(_Bin->list, buff[i]);
+		}
+		return _Bin;
+	}
+	
+	 ~Tree(){
+		 ClearTree(this->list);
+	 }
 };
 
 void main(){
-	Tree* BinTree = new Tree('C');	//Создание вершины 'С'
-	BinTree->AddItem(BinTree->list, 'B');  //Создание листа 'B' налево
-	BinTree->AddItem(BinTree->list, 'D');  //Создание листа 'D' направо
-	BinTree->AddItem(BinTree->list, 'A');  //Создание листа 'A' в третий слой налево
-	BinTree->PrintTree(BinTree->list);
+	int menu = 1;
+	char* str = new char[100];	
+	Tree* BinTree;
+	BinTree = new Tree();
+	while (menu){
+		cout << endl;
+		cout << "1>Create binary tree by your string" << endl;
+		cout << "2>Add new element" << endl;
+		cout << "3>Clear tree" << endl;
+		cout << "4>Delete literal by tree" << endl;
+		cout << "5>Print tree" << endl;
+		cout << "0>Exit" << endl;
+		cin >> menu;
+	switch(menu){
+		case 1:
+			cout << endl;
+			BinTree->ClearTree(BinTree->list);
+			cout << "Please, enter the string: ";
+			cin >> str;			
+			for (int i = 0; str[i]; i++)
+			{
+				BinTree->AddItem(BinTree->list, str[i]);
+			}
+			cout << "Completed!" << endl;
+			break;
+		case 2:			
+			cout << endl;
+			BinTree->list->data = BinTree->list->data;
+			cout << "Please, enter the symbol: ";
+			cin >> str;
+			BinTree->AddItem(BinTree->list, str[0]);
+			cout << "Completed!" << endl;
+			break;
+		case 3:
+			cout << endl;
+			BinTree->ClearTree(BinTree->list);
+			cout << "Completed!" << endl;
+			break;
+		case 4:
+			cout << endl;
+			BinTree = BinTree->DeleteLit(BinTree,str);
+			cout << "Completed!" << endl;
+			break;
+		case 5:
+			cout << endl;
+			try{
+				BinTree->PrintTree(BinTree->list);
+			}
+			catch(...){
+				cout << "Error! Empty tree!" << endl;
+			}
+			break;
+		case 0:
+			delete BinTree;
+			exit;
+			break;
+		default: 
+			menu = 1;
+			break;
+	}
+	}
 	system("pause");
 }
